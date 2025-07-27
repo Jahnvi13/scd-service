@@ -12,7 +12,6 @@ import (
 
 func main() {
 	db.InitDB()
-	db.SeedJobs()
 
 	lis, err := net.Listen("tcp", ":8000")
 	if err != nil {

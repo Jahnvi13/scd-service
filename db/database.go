@@ -17,8 +17,12 @@ func InitDB() {
 		log.Fatalf("failed to connect to db: %v", err)
 	}
 
-	err = DB.AutoMigrate(&models.Job{})
+	err = DB.AutoMigrate(&models.Job{}, &models.Timelog{}, &models.PaymentLineItem{})
 	if err != nil {
 		log.Fatalf("failed to migrate db: %v", err)
 	}
+
+	SeedJobs()
+	SeedTimelogs()
+	SeedPaymentLineItems()
 }

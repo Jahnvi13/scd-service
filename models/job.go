@@ -12,9 +12,9 @@ type Job struct {
 }
 
 type Timelog struct {
-	ID        string `gorm:"primaryKey"`
-	Version   int32  `gorm:"primaryKey"`
-	UID       string `gorm:"unique"`
+	ID        string
+	Version   int32
+	UID       string `gorm:"primaryKey"`
 	Duration  int64
 	TimeStart int64
 	TimeEnd   int64
@@ -23,9 +23,9 @@ type Timelog struct {
 }
 
 type PaymentLineItem struct {
-	ID         string `gorm:"primaryKey"`
-	Version    int32  `gorm:"primaryKey"`
-	UID        string `gorm:"unique"`
+	ID         string
+	Version    int32
+	UID        string `gorm:"primaryKey"`
 	JobUID     string
 	TimelogUID string
 	Amount     float32

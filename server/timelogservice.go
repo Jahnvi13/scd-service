@@ -11,12 +11,48 @@ import (
 	"github.com/google/uuid"
 )
 
-func GetLatestTimelogsByJobUID(jobUID string) ([]models.Timelog, error) {
-	var timelogs []models.Timelog
-	err := GetLatestVersionQuery(db.DB, &models.Timelog{}, "id").
-		Where("job_uid = ?", jobUID).
-		Find(&timelogs).Error
-	return timelogs, err
+// func GetLatestTimelogsByJobUID(jobUID string) ([]models.Timelog, error) {
+// 	var timelogs []models.Timelog
+// 	err := GetLatestVersionQuery(db.DB, &models.Timelog{}, "id").
+// 		Where("job_uid = ?", jobUID).
+// 		Find(&timelogs).Error
+// 	return timelogs, err
+// }
+
+func (s *server) GetLatestTimelogs(ctx context.Context, req *proto.GetLatestTimelogsRequest) (*proto.GetLatestTimelogsResponse, error) {
+	var latestVersions []models.Timelog
+	subQuery := db.DB.
+		Table("timelogs").
+		Select("uid, MAX(version) as max_version").
+		Group("uid")
+
+	query := db.DB.
+		Joins("JOIN (?) as latest ON timelogs.uid = latest.uid AND timelogs.version = latest.max_version", subQuery)
+
+	if req.TypeFilter != "" {
+		query = query.Where("timelogs.type = ?", req.TypeFilter)
+	}
+
+	err := query.Find(&latestVersions).Error
+	if err != nil {
+		return nil, err
+	}
+
+	var result []*proto.Timelog
+	for _, tl := range latestVersions {
+		result = append(result, &proto.Timelog{
+			Id:        tl.ID,
+			Version:   int32(tl.Version),
+			Uid:       tl.UID,
+			Duration:  tl.Duration,
+			TimeStart: tl.TimeStart,
+			TimeEnd:   tl.TimeEnd,
+			Type:      tl.Type,
+			JobUid:    tl.JobUID,
+		})
+	}
+
+	return &proto.GetLatestTimelogsResponse{Timelogs: result}, nil
 }
 
 func (s *server) UpdateTimelog(ctx context.Context, req *proto.UpdateTimelogRequest) (*proto.Timelog, error) {
@@ -28,13 +64,13 @@ func (s *server) UpdateTimelog(ctx context.Context, req *proto.UpdateTimelogRequ
 	}
 
 	newLog := latest
-	newLog.ID = uuid.NewString()
+	newLog.UID = uuid.NewString()
 	newLog.Version = latest.Version + 1
 
 	for field, value := range req.UpdatedFields {
 		switch field {
-		case "uid":
-			newLog.UID = value
+		case "id":
+			newLog.ID = value
 		case "duration":
 			duration, err := strconv.ParseInt(value, 10, 64)
 			if err != nil {
