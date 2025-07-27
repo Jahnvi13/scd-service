@@ -15,7 +15,7 @@ func main() {
 	defer c.Close()
 
 	// Test GetLatestJobs
-	jobs, err := c.GetLatestJobs("")
+	jobs, err := c.GetLatestJobs("in-progress")
 	if err != nil {
 		log.Fatalf("error calling GetLatestJobs: %v", err)
 	}
