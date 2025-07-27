@@ -11,14 +11,6 @@ import (
 	"github.com/google/uuid"
 )
 
-// func GetLatestPaymentLineItemsByJobUID(jobUID string) ([]models.PaymentLineItem, error) {
-// 	var items []models.PaymentLineItem
-// 	err := GetLatestVersionQuery(db.DB, &models.PaymentLineItem{}, "id").
-// 		Where("job_uid = ?", jobUID).
-// 		Find(&items).Error
-// 	return items, err
-// }
-
 func (s *server) GetLatestPaymentLineItems(ctx context.Context, req *proto.GetLatestPaymentLineItemsRequest) (*proto.GetLatestPaymentLineItemsResponse, error) {
 	var latestItems []models.PaymentLineItem
 	subQuery := db.DB.

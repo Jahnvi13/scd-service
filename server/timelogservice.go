@@ -11,14 +11,6 @@ import (
 	"github.com/google/uuid"
 )
 
-// func GetLatestTimelogsByJobUID(jobUID string) ([]models.Timelog, error) {
-// 	var timelogs []models.Timelog
-// 	err := GetLatestVersionQuery(db.DB, &models.Timelog{}, "id").
-// 		Where("job_uid = ?", jobUID).
-// 		Find(&timelogs).Error
-// 	return timelogs, err
-// }
-
 func (s *server) GetLatestTimelogs(ctx context.Context, req *proto.GetLatestTimelogsRequest) (*proto.GetLatestTimelogsResponse, error) {
 	var latestVersions []models.Timelog
 	subQuery := db.DB.
