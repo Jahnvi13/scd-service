@@ -39,3 +39,20 @@ func (c *Client) GetLatestJobs(statusFilter string) ([]*proto.Job, error) {
 
 	return res.Jobs, nil
 }
+
+func (c *Client) UpdateJob(id string, updates map[string]string) (*proto.Job, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	req := &proto.UpdateJobRequest{
+		Id:            id,
+		UpdatedFields: updates,
+	}
+
+	res, err := c.client.UpdateJob(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}

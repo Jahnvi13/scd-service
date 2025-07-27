@@ -23,4 +23,17 @@ func main() {
 	for _, job := range jobs {
 		fmt.Printf("- ID: %s, Title: %s, Status: %s, Version: %d\n", job.Id, job.Title, job.Status, job.Version)
 	}
+
+	updatedJob, err := c.UpdateJob("uid1", map[string]string{
+		"status": "in-progress",
+		"title":  "Backend Developer",
+		"rate":   "25.5",
+	})
+	if err != nil {
+		log.Fatalf("UpdateJob failed: %v", err)
+	}
+
+	fmt.Printf("Updated Job Version: %d\n", updatedJob.Version)
+	fmt.Printf("Updated Job Fields: %+v\n", updatedJob)
+
 }
